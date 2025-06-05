@@ -1,0 +1,10 @@
+# Terraform files to ignore
+.terraform/
+*.tfstate
+*.tfstate.*
+*.tfplan
+.terraform.lock.hcl
+terraform.exe
+# For Windows if you have the executable directly in the root
+terraform.exe
+terraform.exe.backup

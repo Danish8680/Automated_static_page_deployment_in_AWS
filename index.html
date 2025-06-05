@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BunkCalc</title>
+    <style>
+        body {
+    font-family: 'Times New Roman', serif;
+    background-color: #C7DB9C;
+    color: white;
+    text-align: center;
+    margin: 0;
+    padding: 0;
+}
+header, footer, .container, .instructions, .predictionTableContainer {
+    width: 50%;
+    margin: 20px auto;
+    padding: 20px;
+    background-color: #A9C87F;
+    color: black;
+    border-radius: 10px;
+    box-shadow: 0px 0px 1px rgba(0, 0, 0, 0.2);
+    text-align: left;
+}
+.container {
+    background: #FFF0BD;
+    color: black;
+}
+input, button {
+    font-family: 'Times New Roman', serif;
+    margin: 10px 0;
+    padding: 10px;
+    border-radius: 5px;
+    border: none;
+    width: calc(100% - 22px); /* Adjust width to fit container */
+}
+button {
+    background-color: #C7DB9C;
+    color: black;
+    cursor: pointer;
+}
+button:hover {
+    background-color: #A9C87F;
+}
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+th, td {
+    border: 1px solid #A9C87F;
+    padding: 10px;
+    text-align: center;
+}
+.instructions {
+    color: black; /* Set instructions text color to black */
+}
+@media (max-width: 768px) {
+    header, footer, .container, .instructions, .predictionTableContainer {
+        width: 80%;
+    }
+}
+@media (max-width: 480px) {
+    header, footer, .container, .instructions, .predictionTableContainer {
+        width: 95%;
+    }
+    input, button {
+        width: calc(100% - 20px); /* Adjust width to fit container */
+    }
+}
+    </style>
+</head>
+<body>
+    <header>
+        <h1>BunkCalc - Attendance Calculator</h1>
+    </header>
+    <div class="container">
+        <label>New Total Hours:</label>
+        <input type="number" id="totalHours" placeholder="Enter total hours">
+        <br>
+        <label>New Present Hours:</label>
+        <input type="number" id="presentHours" placeholder="Enter present hours">
+        <br>
+        <label>No. of Hours Going to Take Leave:</label>
+        <input type="number" id="leaveHours" placeholder="Enter leave hours" min="0">
+        <br>
+        <button onclick="calculateAttendance()">Calculate</button>
+        <button onclick="clearInputs()">Clear</button>
+        <h2 id="result"></h2>
+    </div>
+    <div class="predictionTableContainer" style="display:none;">
+        <table id="predictionTable">
+            <thead>
+                <tr>
+                    <th>Target Percentage</th>
+                    <th>Hours Required</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>60%</td>
+                    <td id="target60"></td>
+                </tr>
+                <tr>
+                    <td>65%</td>
+                    <td id="target65"></td>
+                </tr>
+                <tr>
+                    <td>70%</td>
+                    <td id="target70"></td>
+                </tr>
+                <tr>
+                    <td>75%</td>
+                    <td id="target75"></td>
+                </tr>
+                <tr>
+                    <td>80%</td>
+                    <td id="target80"></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <div class="instructions">
+        <h2>Instructions for Using BunkCalc</h2>
+        <p>You can take total hours and present hours from your ERP portal.</p>
+        <p><strong>1. Enter New Total Hours</strong><br>
+        This should include all the hours you've attended plus any additional hours you will be considering in the future.<br>
+        Example: If you have attended 220 hours so far and are counting upcoming classes, enter that total.</p>
+        <p><strong>2. Enter New Present Hours</strong><br>
+        This is the number of hours you have been present so far.<br>
+        Example: If you have attended 125 hours, enter <strong>125</strong>.</p>
+        <p><strong>3. Enter No. of Hours Going to Take Leave</strong><br>
+        Input the number of hours you plan to be absent in the future.<br>
+        Example: If you are planning to miss 4 hours of lectures, enter <strong>4</strong>.</p>
+        <p><strong>4. Click on "Calculate" Button</strong><br>
+        The system will compute your new attendance percentage based on the inputs.</p>
+        <p><strong>5. View the Result</strong><br>
+        Your updated attendance percentage will be displayed on the screen.<br>
+        It helps in deciding whether you can afford to take the planned leave or need to adjust your attendance.</p>
+        <p>This tool ensures that you can <strong>track your attendance</strong> and make informed decisions before skipping classes.</p>
+    </div>
+    <footer>
+        <p>&copy; 2025 BunkCalc. All Rights Reserved.</p>
+    </footer>
+    <script>
+        function calculateAttendance() {
+            let totalHours = parseFloat(document.getElementById('totalHours').value);
+            let presentHours = parseFloat(document.getElementById('presentHours').value);
+            let leaveHours = parseFloat(document.getElementById('leaveHours').value) || 0;
+            
+            if (isNaN(totalHours) || isNaN(presentHours) || isNaN(leaveHours)) {
+                document.getElementById('result').innerText = "Please enter valid numbers.";
+                return;
+            }
+            
+            let newTotalHours = totalHours + leaveHours;
+            let newAttendancePercentage = (presentHours / newTotalHours) * 100;
+            
+            document.getElementById('result').innerText = `New Attendance Percentage: ${newAttendancePercentage.toFixed(2)}%`;
+            
+            // Calculate hours required to reach target percentages
+            let targets = [60, 65, 70, 75, 80];
+            let targetElements = ['target60', 'target65', 'target70', 'target75', 'target80'];
+            targets.forEach((target, index) => {
+                let requiredHours = Math.ceil(((target * totalHours) - (100 * presentHours)) / (100 - target));
+                document.getElementById(targetElements[index]).innerText = requiredHours <= 0 ? 'Reached' : requiredHours;
+            });
+            
+            document.querySelector('.predictionTableContainer').style.display = 'block';
+        }
+
+        function clearInputs() {
+            document.getElementById('totalHours').value = '';
+            document.getElementById('presentHours').value = '';
+            document.getElementById('leaveHours').value = '';
+            document.getElementById('result').innerText = '';
+            document.querySelector('.predictionTableContainer').style.display = 'none';
+        }
+    </script>
+</body>
+</html>
